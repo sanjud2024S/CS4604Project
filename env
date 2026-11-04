@@ -1,8 +1,0 @@
-# HireTrack database credentials - Step 5.1 of the CS 4604 DBMS demo
-# Put your own MySQL password on the DB_PASSWORD line, then save.
-# Never commit this file.
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=
-DB_NAME=hiretrack
