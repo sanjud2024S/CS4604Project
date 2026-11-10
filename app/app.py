@@ -34,6 +34,7 @@ import mysql.connector
 from flask import Flask, jsonify, request, send_from_directory
 
 import auth
+import operations
 
 # credentials live in .env, never in the source - Step 5.1 of the demo
 try:
@@ -201,6 +202,7 @@ def connect():
 
 # authentication, sign-up and user management live in auth.py
 auth.register(app, connect)
+operations.register(app, connect)
 
 
 def jsonable(v):

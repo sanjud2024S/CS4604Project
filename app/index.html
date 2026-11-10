@@ -350,6 +350,10 @@ function handleMenu(item) {
     showUsers();
   } else if (item === "Create an admin") {
     showCreateUser();
+  } else if (item === "Browse jobs" || item === "Apply to a job") {
+    showJobs();
+  } else if (item === "Track my applications") {
+    showMyApplications();
   } else {
     showPanel(item, `
       <p>This section is part of the HireTrack interface.</p>
@@ -578,6 +582,87 @@ async function createUser(event) {
     loadUnlinkedPeople();
   } catch (error) {
     $("create-user-error").textContent = error.message;
+  }
+}
+
+// CANDIDATE: BROWSE JOBS AND APPLY
+async function showJobs() {
+  showPanel("Browse jobs", "<p>Loading job postings...</p>");
+  try {
+    const data = await request("/api/jobs");
+    const jobs = data.jobs || [];
+    if (!jobs.length) {
+      showPanel("Browse jobs", "<p>No open job postings right now.</p>");
+      return;
+    }
+    const rows = jobs.map(j => `
+      <tr>
+        <td>${escapeHtml(j.title)}</td>
+        <td>${escapeHtml(j.department)}</td>
+        <td>${escapeHtml(j.description || "")}</td>
+        <td>${j.applied
+          ? '<span class="muted">Applied</span>'
+          : `<button class="primary apply-btn" data-job="${j.job_id}">Apply</button>`}</td>
+      </tr>`).join("");
+    showPanel("Browse jobs", `
+      <div class="field" style="max-width:420px">
+        <label for="resume-link">Resume link (optional)</label>
+        <input id="resume-link" placeholder="https://...">
+      </div>
+      <div id="apply-msg" class="error"></div>
+      <div class="table-scroll"><table>
+        <thead><tr><th>Title</th><th>Department</th><th>Description</th><th></th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>`);
+    document.querySelectorAll(".apply-btn").forEach(button =>
+      button.addEventListener("click", () => applyToJob(button.dataset.job)));
+  } catch (error) {
+    showPanel("Browse jobs", `<p class="error">${escapeHtml(error.message)}</p>`);
+  }
+}
+
+async function applyToJob(jobId) {
+  const resume = $("resume-link").value.trim();
+  try {
+    const result = await request("/api/apply", {
+      method: "POST",
+      body: JSON.stringify({job_id: Number(jobId), resume_link: resume})
+    });
+    await showJobs();
+    $("apply-msg").className = "success";
+    $("apply-msg").textContent = `Application #${result.application_id} submitted.`;
+  } catch (error) {
+    $("apply-msg").className = "error";
+    $("apply-msg").textContent = error.message;
+  }
+}
+
+// CANDIDATE: TRACK MY APPLICATIONS
+async function showMyApplications() {
+  showPanel("Track my applications", "<p>Loading your applications...</p>");
+  try {
+    const data = await request("/api/my-applications");
+    const apps = data.applications || [];
+    if (!apps.length) {
+      showPanel("Track my applications", "<p>You have not applied to any jobs yet.</p>");
+      return;
+    }
+    const rows = apps.map(a => `
+      <tr>
+        <td>${a.application_id}</td>
+        <td>${escapeHtml(a.title)}</td>
+        <td>${escapeHtml(a.department)}</td>
+        <td>${escapeHtml(a.submitted)}</td>
+        <td>${escapeHtml(a.status)}</td>
+      </tr>`).join("");
+    showPanel("Track my applications", `
+      <div class="table-scroll"><table>
+        <thead><tr><th>#</th><th>Job</th><th>Department</th><th>Submitted</th><th>Status</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>`);
+  } catch (error) {
+    showPanel("Track my applications",
+      `<p class="error">${escapeHtml(error.message)}</p>`);
   }
 }
 
