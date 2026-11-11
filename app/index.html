@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HireTrack</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: #f4f4f2; color: #26241f;
+  font-family: "Segoe UI", Arial, sans-serif; font-size: 15px;
+}
+button, input, select { font: inherit; }
+button {
+  padding: 9px 16px; border: 1px solid #b4b2a9;
+  border-radius: 6px; cursor: pointer; font-weight: 600;
+}
+button:disabled { opacity: .5; cursor: default; }
+.primary { background: #185FA5; color: white; border-color: #185FA5; }
+.secondary { background: white; color: #26241f; }
+.danger { background: #f7dcdc; }
+.hidden { display: none !important; }
+.muted { color: #77766f; font-size: 13px; }
+.error { color: #a32d2d; min-height: 20px; font-size: 13px; }
+.success { color: #1d6b3a; min-height: 20px; font-size: 13px; }
+.card {
+  background: white; border: 1px solid #d8d5cc;
+  border-radius: 10px; padding: 24px;
+}
+.auth-screen {
+  position: fixed; inset: 0; display: flex; align-items: center;
+  justify-content: center; padding: 20px; background: #f4f4f2;
+  z-index: 20; overflow-y: auto;
+}
+.auth-card { width: 100%; max-width: 390px; }
+h1 { font-size: 25px; margin: 0 0 6px; }
+h2 { font-size: 20px; margin: 0 0 12px; }
+h3 { font-size: 16px; margin: 18px 0 8px; }
+.auth-card p { color: #77766f; font-size: 13px; margin: 0 0 20px; }
+.field { margin-bottom: 13px; }
+.field label { display: block; font-size: 13px; margin-bottom: 5px; }
+.field input, .field select {
+  width: 100%; padding: 10px; border: 1px solid #b4b2a9;
+  border-radius: 5px; background: white;
+}
+.auth-card button { width: 100%; margin-top: 5px; }
+.link-button {
+  border: 0; background: none; color: #185FA5;
+  padding: 8px 0; font-weight: 600;
+}
+#topbar {
+  background: white; border-bottom: 1px solid #d8d5cc;
+  padding: 14px 22px; display: flex; align-items: center;
+  justify-content: space-between; gap: 12px; flex-wrap: wrap;
+}
+.brand { font-size: 21px; font-weight: 700; color: #185FA5; }
+#user-info { color: #555; font-size: 13px; }
+#app { max-width: 1200px; margin: 0 auto; padding: 24px; }
+#welcome { margin-bottom: 20px; }
+#menu { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0; }
+#menu button { background: #d7e9f7; border-color: #b6d1e7; }
+#menu button:hover { background: #c4def2; }
+.panel { margin-top: 18px; }
+.panel p { line-height: 1.5; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { text-align: left; padding: 9px; border-bottom: 1px solid #eee; }
+th { background: #edf1f3; position: sticky; top: 0; }
+.table-scroll { overflow: auto; max-height: 400px; }
+.form-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+#browser { margin-top: 20px; }
+#banner { padding: 10px; border-radius: 6px; margin-bottom: 14px; font-size: 13px; }
+#banner.ok { background: #dff0e4; color: #1d6b3a; }
+#banner.bad { background: #fcebeb; color: #a32d2d; }
+.db-layout { display: flex; gap: 16px; align-items: flex-start; }
+#tables {
+  width: 210px; flex: none; background: white;
+  border: 1px solid #d8d5cc; border-radius: 8px; overflow: hidden;
+}
+#tables div { padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #eee; }
+#tables div:hover { background: #f1efe8; }
+#tables div.sel { background: #185FA5; color: white; }
+.db-main { flex: 1; min-width: 0; }
+#gridbox {
+  background: white; border: 1px solid #d8d5cc;
+  border-radius: 8px; max-height: 330px; overflow: auto;
+}
+#db-form { display: flex; flex-wrap: wrap; gap: 12px; }
+.db-field { display: flex; flex-direction: column; width: 220px; }
+.db-field label { font-size: 12px; margin-bottom: 4px; }
+.db-field input {
+  padding: 7px; border: 1px solid #b4b2a9; border-radius: 4px;
+}
+#db-log {
+  background: #1f1f1c; color: #e8e6df; border-radius: 8px;
+  padding: 12px; font-family: Consolas, monospace;
+  font-size: 12px; height: 130px; overflow: auto; white-space: pre-wrap;
+}
+#report-sql {
+  background: #1f1f1c; color: #fac775; border-radius: 8px;
+  padding: 12px; font-family: Consolas, monospace; font-size: 12px;
+  overflow: auto; white-space: pre-wrap; margin: 0;
+}
+#db-log .sql { color: #fac775; }
+#db-log .good { color: #9fe1cb; }
+#db-log .bad { color: #f09595; }
+@media (max-width: 650px) {
+  #app { padding: 14px; }
+  .db-layout { flex-direction: column; }
+  #tables { width: 100%; max-height: 150px; overflow: auto; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<section id="login-screen" class="auth-screen">
+  <div class="card auth-card">
+    <h1>HireTrack</h1>
+    <p>Sign in to your account to continue.</p>
+    <form id="login-form">
+      <div class="field">
+        <label for="login-username">Username</label>
+        <input id="login-username" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="login-password">Password</label>
+        <input id="login-password" type="password"
+               autocomplete="current-password" required>
+      </div>
+      <div id="login-error" class="error"></div>
+      <button class="primary" type="submit">Log in</button>
+    </form>
+    <p style="margin-top:16px;margin-bottom:0">
+      Don't have an account?
+      <button class="link-button" id="show-signup">Create a Candidate account</button>
+    </p>
+  </div>
+</section>
+
+<!-- CANDIDATE SIGN UP -->
+<section id="signup-screen" class="auth-screen hidden">
+  <div class="card auth-card">
+    <h1>Create an account</h1>
+    <p>Sign up to use HireTrack as a Candidate.</p>
+    <form id="signup-form">
+      <div class="field">
+        <label for="signup-name">Full name</label>
+        <input id="signup-name" required autocomplete="name">
+      </div>
+      <div class="field">
+        <label for="signup-email">Email</label>
+        <input id="signup-email" type="email" required autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="signup-username">Username</label>
+        <input id="signup-username" required autocomplete="username">
+      </div>
+      <div class="field">
+        <label for="signup-password">Password (at least 8 characters)</label>
+        <input id="signup-password" type="password" required minlength="8"
+               autocomplete="new-password">
+      </div>
+      <div id="signup-error" class="error"></div>
+      <button class="primary" type="submit">Create account</button>
+    </form>
+    <button class="link-button" id="show-login">Back to login</button>
+  </div>
+</section>
+
+<!-- CHANGE PASSWORD -->
+<section id="password-screen" class="auth-screen hidden">
+  <div class="card auth-card">
+    <h1>Change your password</h1>
+    <p id="password-description">
+      Enter your current password and choose a new password.
+    </p>
+    <form id="password-form">
+      <div class="field">
+        <label for="old-password">Current password</label>
+        <input id="old-password" type="password" required
+               autocomplete="current-password">
+      </div>
+      <div class="field">
+        <label for="new-password">New password (at least 8 characters)</label>
+        <input id="new-password" type="password" required minlength="8"
+               autocomplete="new-password">
+      </div>
+      <div id="password-error" class="error"></div>
+      <button class="primary" type="submit">Update password</button>
+    </form>
+    <button id="password-logout" class="link-button">Log out</button>
+  </div>
+</section>
+
+<!-- MAIN APPLICATION -->
+<div id="application" class="hidden">
+  <header id="topbar">
+    <div class="brand">HireTrack</div>
+    <div>
+      <span id="user-info"></span>
+      <button id="change-password-button" class="secondary">Change password</button>
+      <button id="logout-button" class="danger">Log out</button>
+    </div>
+  </header>
+
+  <main id="app">
+    <section id="welcome">
+      <h1 id="welcome-title">Welcome to HireTrack</h1>
+      <p class="muted" id="welcome-subtitle"></p>
+    </section>
+
+    <h2>Your dashboard</h2>
+    <p class="muted">Choose an option below to get started.</p>
+    <nav id="menu"></nav>
+
+    <section id="panel" class="panel card">
+      <h2 id="panel-title">Welcome</h2>
+      <div id="panel-content">
+        <p>Select an option from your dashboard.</p>
+      </div>
+    </section>
+
+    <!-- Admin database maintenance -->
+    <section id="browser" class="hidden">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <h2>Database maintenance</h2>
+        <button id="close-browser" class="secondary">Back to dashboard</button>
+      </div>
+      <div id="banner" class="ok">Connecting...</div>
+      <div class="db-layout">
+        <div id="tables"></div>
+        <div class="db-main">
+          <h2 id="db-title"></h2>
+          <div id="gridbox">
+            <table>
+              <thead id="thead"></thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+          <h3>New row</h3>
+          <div id="db-form"></div>
+          <div style="margin-top:14px">
+            <button id="insert" class="primary">Insert row</button>
+            <button id="del" class="danger" disabled>Delete selected row</button>
+          </div>
+        </div>
+      </div>
+      <h3>SQL log</h3>
+      <div id="db-log"></div>
+    </section>
+  </main>
+</div>
+
+<script>
+const API = "";
+const $ = id => document.getElementById(id);
+let currentUser = null;
+let SCHEMA = {};
+let dbTable = null;
+let picked = null;
+
+async function request(path, options = {}) {
+  const response = await fetch(API + path, {
+    credentials: "same-origin",
+    ...options,
+    headers: {
+      ...(options.body ? {"Content-Type": "application/json"} : {}),
+      ...(options.headers || {})
+    }
+  });
+  let data = {};
+  try { data = await response.json(); } catch (_) {}
+  if (!response.ok) {
+    throw new Error(data.error || `Request failed (${response.status})`);
+  }
+  return data;
+}
+
+function showOnly(screenId) {
+  ["login-screen", "signup-screen", "password-screen", "application"]
+    .forEach(id => $(id).classList.add("hidden"));
+  $(screenId).classList.remove("hidden");
+}
+
+function showLogin() {
+  currentUser = null;
+  $("login-form").reset();
+  $("login-error").textContent = "";
+  showOnly("login-screen");
+}
+
+function showPasswordScreen(forced = false) {
+  $("password-form").reset();
+  $("password-error").textContent = "";
+  $("password-description").textContent = forced
+    ? "Your account requires a password change before you can continue."
+    : "Enter your current password and choose a new password.";
+  const escape = $("password-logout");
+  escape.classList.remove("hidden");
+  escape.textContent = forced ? "Log out" : "Cancel";
+  showOnly("password-screen");
+}
+
+function enterApplication(user) {
+  currentUser = user;
+  if (user.must_change_password) {
+    showPasswordScreen(true);
+    return;
+  }
+
+  showOnly("application");
+  $("browser").classList.add("hidden");
+  $("user-info").textContent =
+    `${user.display_name || user.username} · ${user.role}`;
+  $("welcome-title").textContent =
+    `Welcome, ${user.display_name || user.username}`;
+  $("welcome-subtitle").textContent = `Signed in as ${user.role}.`;
+
+  renderMenu(user.menu || []);
+  showPanel("Welcome", `
+    <p>Welcome to HireTrack. Choose one of your available dashboard options above.</p>
+    <p class="muted">Your available options are based on your account role.</p>
+  `);
+}
+
+function renderMenu(items) {
+  const menu = $("menu");
+  menu.innerHTML = "";
+  items.forEach(item => {
+    const button = document.createElement("button");
+    button.textContent = item;
+    button.addEventListener("click", () => handleMenu(item));
+    menu.appendChild(button);
+  });
+
+  // Database maintenance is separate from the role task menu.
+  if (currentUser && currentUser.role === "Admin") {
+    const dbButton = document.createElement("button");
+    dbButton.textContent = "Database maintenance";
+    dbButton.addEventListener("click", openDatabaseBrowser);
+    menu.appendChild(dbButton);
+  }
+}
+
+function showPanel(title, html) {
+  $("browser").classList.add("hidden");
+  $("panel").classList.remove("hidden");
+  $("panel-title").textContent = title;
+  $("panel-content").innerHTML = html;
+}
+
+function handleMenu(item) {
+  if (item === "Manage users") {
+    showUsers();
+  } else if (item === "Create an admin") {
+    showCreateUser();
+  } else if (item === "Browse jobs" || item === "Apply to a job") {
+    showJobs();
+  } else if (item === "Track my applications") {
+    showMyApplications();
+  } else if (item === "My interviews") {
+    showMyInterviews();
+  } else if (item === "Reports") {
+    showReports();
+  } else {
+    showPanel(item, `
+      <p>This section is part of the HireTrack interface.</p>
+      <p class="muted">The task screen is currently a placeholder for the next development stage.</p>
+    `);
+  }
+}
+
+// LOGIN
+$("login-form").addEventListener("submit", async event => {
+  event.preventDefault();
+  $("login-error").textContent = "";
+  try {
+    const user = await request("/api/login", {
+      method: "POST",
+      body: JSON.stringify({
+        username: $("login-username").value.trim(),
+        password: $("login-password").value
+      })
+    });
+    enterApplication(user);
+  } catch (error) {
+    $("login-error").textContent = error.message;
+  }
+});
+
+// SIGN UP
+$("signup-form").addEventListener("submit", async event => {
+  event.preventDefault();
+  $("signup-error").textContent = "";
+  try {
+    const user = await request("/api/signup", {
+      method: "POST",
+      body: JSON.stringify({
+        name: $("signup-name").value.trim(),
+        email: $("signup-email").value.trim(),
+        username: $("signup-username").value.trim(),
+        password: $("signup-password").value
+      })
+    });
+    enterApplication(user);
+  } catch (error) {
+    $("signup-error").textContent = error.message;
+  }
+});
+
+// PASSWORD CHANGE
+$("password-form").addEventListener("submit", async event => {
+  event.preventDefault();
+  $("password-error").textContent = "";
+  try {
+    const user = await request("/api/change-password", {
+      method: "POST",
+      body: JSON.stringify({
+        old_password: $("old-password").value,
+        new_password: $("new-password").value
+      })
+    });
+    enterApplication(user);
+  } catch (error) {
+    $("password-error").textContent = error.message;
+  }
+});
+
+// LOGOUT
+async function logout() {
+  try { await request("/api/logout", {method: "POST"}); }
+  catch (error) { console.error(error); }
+  $("application").classList.add("hidden");
+  $("browser").classList.add("hidden");
+  showLogin();
+}
+
+$("logout-button").addEventListener("click", logout);
+$("password-logout").addEventListener("click", () => {
+  // On the forced screen this is the only way out, so it logs out.
+  // On a voluntary visit it just cancels and goes back to the dashboard.
+  if (currentUser && !currentUser.must_change_password) {
+    enterApplication(currentUser);
+  } else {
+    logout();
+  }
+});
+$("change-password-button").addEventListener("click", () => showPasswordScreen(false));
+
+// SCREEN NAVIGATION
+$("show-signup").addEventListener("click", () => {
+  $("signup-form").reset();
+  $("signup-error").textContent = "";
+  showOnly("signup-screen");
+});
+$("show-login").addEventListener("click", showLogin);
+
+// ADMIN: LIST USERS
+async function showUsers() {
+  showPanel("Manage users", "<p>Loading user accounts...</p>");
+  try {
+    const data = await request("/api/admin/users");
+    const users = data.users || [];
+    const wrap = document.createElement("div");
+    if (!users.length) {
+      wrap.textContent = "No user accounts found.";
+    } else {
+      const table = document.createElement("table");
+      const head = document.createElement("thead");
+      head.innerHTML = "<tr><th>Username</th><th>Name</th><th>Role</th><th>Password reset required</th></tr>";
+      table.appendChild(head);
+      const body = document.createElement("tbody");
+      users.forEach(user => {
+        const tr = document.createElement("tr");
+        [user.username, user.display_name, user.role,
+          user.must_change_password ? "Yes" : "No"].forEach(value => {
+          const td = document.createElement("td");
+          td.textContent = value == null ? "" : String(value);
+          tr.appendChild(td);
+        });
+        body.appendChild(tr);
+      });
+      table.appendChild(body);
+      const scroll = document.createElement("div");
+      scroll.className = "table-scroll";
+      scroll.appendChild(table);
+      wrap.appendChild(scroll);
+    }
+    $("panel-content").replaceChildren(wrap);
+  } catch (error) {
+    showPanel("Manage users",
+      `<p class="error">${escapeHtml(error.message)}</p>`);
+  }
+}
+
+// ADMIN: CREATE ACCOUNTS
+function showCreateUser() {
+  showPanel("Create an account", `
+    <p>Create an Admin, Recruiter, or Hiring Manager login.</p>
+    <form id="create-user-form">
+      <div class="form-grid">
+        <div class="field">
+          <label for="new-role">Account role</label>
+          <select id="new-role">
+            <option>Admin</option>
+            <option>Recruiter</option>
+            <option>Hiring Manager</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="new-username">Username</label>
+          <input id="new-username" required>
+        </div>
+        <div class="field">
+          <label for="new-account-password">Temporary password (at least 8 characters)</label>
+          <input id="new-account-password" type="password" minlength="8" required>
+        </div>
+        <div class="field hidden" id="person-field">
+          <label for="person-id">Choose existing staff member</label>
+          <select id="person-id"></select>
+        </div>
+      </div>
+      <div id="create-user-error" class="error"></div>
+      <div id="create-user-success" class="success"></div>
+      <button class="primary" type="submit">Create account</button>
+    </form>
+  `);
+
+  $("new-role").addEventListener("change", loadUnlinkedPeople);
+  $("create-user-form").addEventListener("submit", createUser);
+  loadUnlinkedPeople();
+}
+
+async function loadUnlinkedPeople() {
+  const role = $("new-role").value;
+  const personField = $("person-field");
+  const personSelect = $("person-id");
+
+  if (role === "Admin") {
+    personField.classList.add("hidden");
+    personSelect.innerHTML = "";
+    return;
+  }
+
+  personField.classList.remove("hidden");
+  personSelect.innerHTML = "<option value=''>Loading...</option>";
+
+  try {
+    const data = await request(
+      "/api/admin/unlinked?role=" + encodeURIComponent(role)
+    );
+    personSelect.innerHTML = "";
+    if (!data.people || data.people.length === 0) {
+      personSelect.innerHTML = "<option value=''>No unlinked staff available</option>";
+      return;
+    }
+    data.people.forEach(person => {
+      const option = document.createElement("option");
+      option.value = person.id;
+      option.textContent = person.name;
+      personSelect.appendChild(option);
+    });
+  } catch (error) {
+    personSelect.innerHTML = "<option value=''>Could not load staff</option>";
+    $("create-user-error").textContent = error.message;
+  }
+}
+
+async function createUser(event) {
+  event.preventDefault();
+  $("create-user-error").textContent = "";
+  $("create-user-success").textContent = "";
+
+  const role = $("new-role").value;
+  const body = {
+    username: $("new-username").value.trim(),
+    password: $("new-account-password").value,
+    role: role
+  };
+
+  if (role !== "Admin") {
+    body.person_id = $("person-id").value;
+    if (!body.person_id) {
+      $("create-user-error").textContent =
+        "Choose an existing staff member first.";
+      return;
+    }
+  }
+
+  try {
+    const result = await request("/api/admin/create-user", {
+      method: "POST",
+      body: JSON.stringify(body)
+    });
+    $("create-user-success").textContent =
+      `${result.username} was created as ${result.role}. They must change their password at first login.`;
+    $("create-user-form").reset();
+    loadUnlinkedPeople();
+  } catch (error) {
+    $("create-user-error").textContent = error.message;
+  }
+}
+
+// CANDIDATE: BROWSE JOBS AND APPLY
+async function showJobs() {
+  showPanel("Browse jobs", "<p>Loading job postings...</p>");
+  try {
+    const data = await request("/api/candidate/jobs");
+    const jobs = data.jobs || [];
+    if (!jobs.length) {
+      showPanel("Browse jobs", "<p>No open job postings right now.</p>");
+      return;
+    }
+    const rows = jobs.map(j => `
+      <tr>
+        <td>${escapeHtml(j.title)}</td>
+        <td>${escapeHtml(j.department)}</td>
+        <td>${escapeHtml(j.description || "")}</td>
+        <td>${j.applied
+          ? '<span class="muted">Applied</span>'
+          : `<button class="primary apply-btn" data-job="${j.id}">Apply</button>`}</td>
+      </tr>`).join("");
+    showPanel("Browse jobs", `
+      <div class="field" style="max-width:420px">
+        <label for="resume-link">Resume link (optional)</label>
+        <input id="resume-link" placeholder="https://...">
+      </div>
+      <div id="apply-msg" class="error"></div>
+      <div class="table-scroll"><table>
+        <thead><tr><th>Title</th><th>Department</th><th>Description</th><th></th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>`);
+    document.querySelectorAll(".apply-btn").forEach(button =>
+      button.addEventListener("click", () => applyToJob(button.dataset.job)));
+  } catch (error) {
+    showPanel("Browse jobs", `<p class="error">${escapeHtml(error.message)}</p>`);
+  }
+}
+
+async function applyToJob(jobId) {
+  const resume = $("resume-link").value.trim();
+  try {
+    const result = await request("/api/candidate/apply", {
+      method: "POST",
+      body: JSON.stringify({job_id: Number(jobId), resume_link: resume})
+    });
+    await showJobs();
+    $("apply-msg").className = "success";
+    $("apply-msg").textContent = `Application #${result.application_id} submitted.`;
+  } catch (error) {
+    $("apply-msg").className = "error";
+    $("apply-msg").textContent = error.message;
+  }
+}
+
+// SHARED TABLE RENDERER
+// Most read endpoints answer with {columns: [...], rows: [[...]]}, so one
+// renderer covers all of them. NULL means "nothing there yet" and is drawn
+// as an empty cell rather than the word "None".
+function renderTable(columns, rows) {
+  const head = columns.map(c => `<th>${escapeHtml(c)}</th>`).join("");
+  const body = rows.map(row =>
+    "<tr>" + row.map(value =>
+      `<td>${value === null || value === undefined ? "" : escapeHtml(value)}</td>`
+    ).join("") + "</tr>").join("");
+  return `<div class="table-scroll"><table>
+    <thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
+}
+
+// Loads any {columns, rows} endpoint into the panel.
+async function showTableScreen(title, path, emptyMessage) {
+  showPanel(title, "<p>Loading...</p>");
+  try {
+    const data = await request(path);
+    showPanel(title, (data.rows && data.rows.length)
+      ? renderTable(data.columns, data.rows)
+      : `<p>${escapeHtml(emptyMessage)}</p>`);
+  } catch (error) {
+    showPanel(title, `<p class="error">${escapeHtml(error.message)}</p>`);
+  }
+}
+
+// CANDIDATE: TRACK MY APPLICATIONS
+function showMyApplications() {
+  return showTableScreen("Track my applications",
+    "/api/candidate/applications",
+    "You have not applied to any jobs yet.");
+}
+
+// CANDIDATE: MY INTERVIEWS
+function showMyInterviews() {
+  return showTableScreen("My interviews",
+    "/api/candidate/interviews",
+    "You have no interviews scheduled yet.");
+}
+
+// REPORTS - one screen serves every report the signed-in role may run
+async function showReports() {
+  showPanel("Reports", "<p>Loading reports...</p>");
+  try {
+    const data = await request("/api/reports");
+    const list = data.reports || [];
+    if (!list.length) {
+      showPanel("Reports", "<p>No reports are available for your role.</p>");
+      return;
+    }
+    showPanel("Reports", `
+      <div class="field" style="max-width:520px">
+        <label for="report-id">Choose a report</label>
+        <select id="report-id">
+          ${list.map(r =>
+            `<option value="${escapeHtml(r.id)}">${escapeHtml(r.title)}</option>`
+          ).join("")}
+        </select>
+      </div>
+      <p class="muted" id="report-description"></p>
+      <div id="report-output"><p class="muted">Pick a report to run it.</p></div>`);
+
+    const describe = () => {
+      const chosen = list.find(r => r.id === $("report-id").value);
+      $("report-description").textContent = chosen
+        ? `${chosen.description}  (uses ${chosen.aggregates.join(", ")})`
+        : "";
+    };
+    $("report-id").addEventListener("change", () => { describe(); runReport(); });
+    describe();
+    runReport();
+  } catch (error) {
+    showPanel("Reports", `<p class="error">${escapeHtml(error.message)}</p>`);
+  }
+}
+
+async function runReport() {
+  const id = $("report-id").value;
+  $("report-output").innerHTML = "<p>Running...</p>";
+  try {
+    const data = await request("/api/reports/" + encodeURIComponent(id));
+    $("report-output").innerHTML = `
+      ${data.row_count
+        ? renderTable(data.columns, data.rows)
+        : "<p>This report has no rows yet.</p>"}
+      <p class="muted" style="margin-top:12px">
+        ${data.row_count} row(s). The SQL that produced this:</p>
+      <pre id="report-sql">${escapeHtml(data.sql)}</pre>`;
+  } catch (error) {
+    $("report-output").innerHTML =
+      `<p class="error">${escapeHtml(error.message)}</p>`;
+  }
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;",
+    '"': "&quot;", "'": "&#39;"
+  })[char]);
+}
+
+// ADMIN: DATABASE BROWSER
+function dbLog(message, cls) {
+  const line = document.createElement("div");
+  if (cls) line.className = cls;
+  line.textContent = message;
+  $("db-log").appendChild(line);
+  $("db-log").scrollTop = $("db-log").scrollHeight;
+}
+
+async function openDatabaseBrowser() {
+  $("panel").classList.add("hidden");
+  $("browser").classList.remove("hidden");
+  try {
+    const status = await request("/api/status");
+    if (status.connected) {
+      $("banner").className = "ok";
+      $("banner").textContent =
+        `CONNECTED · ${status.dbms} · ${status.host} · ${status.database}`;
+    } else {
+      $("banner").className = "bad";
+      $("banner").textContent = "NOT CONNECTED: " + status.error;
+    }
+    await loadTables();
+  } catch (error) {
+    $("banner").className = "bad";
+    $("banner").textContent = error.message;
+  }
+}
+
+async function loadTables() {
+  SCHEMA = await request("/api/tables");
+  const box = $("tables");
+  box.innerHTML = "";
+  Object.keys(SCHEMA).forEach(name => {
+    const div = document.createElement("div");
+    div.textContent = name;
+    div.addEventListener("click", () => pickTable(name));
+    box.appendChild(div);
+  });
+  if (Object.keys(SCHEMA).length) pickTable(Object.keys(SCHEMA)[0]);
+}
+
+function pickTable(name) {
+  dbTable = name;
+  picked = null;
+  [...$("tables").children].forEach(div =>
+    div.classList.toggle("sel", div.textContent === name));
+  buildDbForm();
+  refreshTable();
+}
+
+function buildDbForm() {
+  const form = $("db-form");
+  form.innerHTML = "";
+  (SCHEMA[dbTable] || []).forEach(column => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "db-field";
+    const label = document.createElement("label");
+    label.textContent = column.name +
+      (column.pk ? " (PK)" : "") +
+      (column.fk ? " (FK)" : "") +
+      (column.required ? " *required" : "");
+    const input = document.createElement("input");
+    input.id = "dbf_" + column.name;
+    wrapper.append(label, input);
+    form.appendChild(wrapper);
+  });
+}
+
+async function refreshTable() {
+  try {
+    const data = await request("/api/table/" + encodeURIComponent(dbTable));
+    $("db-title").textContent =
+      `${dbTable} — ${data.count} row(s) in the database`;
+    const head = $("thead");
+    head.innerHTML = "";
+    const headerRow = document.createElement("tr");
+    data.columns.forEach(column => {
+      const th = document.createElement("th");
+      th.textContent = column;
+      headerRow.appendChild(th);
+    });
+    head.appendChild(headerRow);
+
+    const body = $("tbody");
+    body.innerHTML = "";
+    data.rows.forEach(row => {
+      const tr = document.createElement("tr");
+      row.forEach(value => {
+        const td = document.createElement("td");
+        td.textContent = value === null ? "NULL" : String(value);
+        if (value === null) td.style.color = "#999";
+        tr.appendChild(td);
+      });
+      tr.addEventListener("click", () => {
+        picked = {};
+        data.columns.forEach((column, index) => picked[column] = row[index]);
+        [...body.children].forEach(item => item.style.background = "");
+        tr.style.background = "#d7e9f7";
+        $("del").disabled = false;
+      });
+      body.appendChild(tr);
+    });
+
+    $("del").disabled = true;
+    picked = null;
+    const primaryKeys = SCHEMA[dbTable].filter(column => column.pk);
+    if (primaryKeys.length === 1 && data.next_id !== null) {
+      const input = $("dbf_" + primaryKeys[0].name);
+      if (input) input.value = data.next_id;
+    }
+  } catch (error) {
+    dbLog(error.message, "bad");
+  }
+}
+
+$("insert").addEventListener("click", async () => {
+  const body = {};
+  SCHEMA[dbTable].forEach(column => {
+    body[column.name] = $("dbf_" + column.name).value.trim();
+  });
+  try {
+    const result = await request("/api/table/" + encodeURIComponent(dbTable), {
+      method: "POST", body: JSON.stringify(body)
+    });
+    if (result.sql) dbLog(result.sql, "sql");
+    dbLog(`OK — row inserted. ${result.before} → ${result.after} rows.`, "good");
+    SCHEMA[dbTable].forEach(column => {
+      $("dbf_" + column.name).value = "";
+    });
+    refreshTable();
+  } catch (error) {
+    dbLog("REJECTED — " + error.message, "bad");
+    alert("The database rejected this row:\n\n" + error.message);
+  }
+});
+
+$("del").addEventListener("click", async () => {
+  if (!picked) return;
+  const keys = SCHEMA[dbTable].filter(column => column.pk);
+  const description = keys.map(column =>
+    `${column.name} = ${picked[column.name]}`).join(", ");
+  if (!confirm(`Delete this row from ${dbTable}?\n\n${description}`)) return;
+
+  const params = new URLSearchParams();
+  keys.forEach(column => params.set(column.name, picked[column.name]));
+  try {
+    const result = await request(
+      `/api/table/${encodeURIComponent(dbTable)}?${params.toString()}`,
+      {method: "DELETE"}
+    );
+    if (result.sql) dbLog(result.sql, "sql");
+    dbLog(`OK — row deleted. ${result.before} → ${result.after} rows.`, "good");
+    refreshTable();
+  } catch (error) {
+    dbLog("REJECTED — " + error.message, "bad");
+    alert("The database rejected this delete:\n\n" + error.message);
+  }
+});
+
+$("close-browser").addEventListener("click", () => {
+  $("browser").classList.add("hidden");
+  $("panel").classList.remove("hidden");
+});
+
+// RESTORE EXISTING SESSION IF ONE EXISTS
+async function initialize() {
+  try {
+    const user = await request("/api/me");
+    enterApplication(user);
+  } catch (_) {
+    showLogin();
+  }
+}
+
+initialize();
+</script>
+</body>
+</html>
