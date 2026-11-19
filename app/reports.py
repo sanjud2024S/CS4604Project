@@ -8,13 +8,14 @@ table below says which report uses which:
 
     COUNT   every report
     MIN     department funnel, posting performance, salary summary,
-            email activity, my application summary, my interview record
+            email activity, my application summary, my interview record,
+            my applications by department
     MAX     department funnel, posting performance, salary summary,
             email activity, candidate sources, my application summary,
-            my interview record
+            my interview record, my applications by department
     AVG     department funnel, posting performance, salary summary,
             interviewer workload, candidate sources,
-            my application summary
+            my application summary, my applications by department
     SUM     salary summary, my application summary
 
 Each report is declared once, in the REPORTS table: its title, the roles
@@ -24,7 +25,7 @@ screen rather than one screen per report.
 
 Reports available to each kind of user:
     Admin            8      Recruiter   6
-    Hiring Manager   5      Candidate   4
+    Hiring Manager   5      Candidate   5
 
 Only constructs from the course notes appear in the SQL:
     SELECT ... FROM ... WHERE, ORDER BY, aliases     (Chapter 4)
@@ -288,6 +289,33 @@ FROM      INTERVIEW i
           INNER JOIN APPLICATION a
           ON i.ApplicationID = a.ApplicationID
 WHERE     a.CandidateID = %s""",
+ },
+ {
+  "id": "my_applications_by_department",
+  "title": "My applications by department",
+  "description": "Where you have applied, how many applications you have "
+                 "in each department, and how your scores there compare.",
+  "roles": ("Candidate",),
+  "aggregates": ["COUNT", "MIN", "AVG", "MAX"],
+  "columns": ["Department", "Applications", "Lowest score",
+              "Average score", "Highest score"],
+  "needs": "candidate_id",
+  "sql": """
+SELECT    d.Name                     AS Department,
+          COUNT(a.ApplicationID)     AS Applications,
+          MIN(k.Score)               AS LowestScore,
+          ROUND(AVG(k.Score), 2)     AS AverageScore,
+          MAX(k.Score)               AS HighestScore
+FROM      APPLICATION a
+          INNER JOIN JOB_POSTING j
+          ON a.JobID = j.JobID
+          INNER JOIN DEPARTMENT d
+          ON j.DepartmentID = d.DepartmentID
+          LEFT OUTER JOIN CANDIDATE_RANKING k
+          ON a.ApplicationID = k.ApplicationID
+WHERE     a.CandidateID = %s
+GROUP BY  d.DepartmentID, d.Name
+ORDER BY  COUNT(a.ApplicationID) DESC, d.Name""",
  },
 ]
 
