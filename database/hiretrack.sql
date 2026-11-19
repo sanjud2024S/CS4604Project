@@ -57,7 +57,6 @@ CREATE TABLE EMAIL_TEMPLATE (
     Body            VARCHAR(500)    NOT NULL,
     PRIMARY KEY (TemplateID) );
 
--- DepartmentID maps the "Works In" relationship (Department 1 : N Hiring Manager)
 CREATE TABLE HIRING_MANAGER (
     EmployeeID      INT             NOT NULL,
     Name            VARCHAR(100)    NOT NULL,
@@ -108,7 +107,6 @@ CREATE TABLE APPLICATION (
     FOREIGN KEY (StatusID) REFERENCES HIRING_STATUS (StatusID)
         ON DELETE RESTRICT ON UPDATE CASCADE );
 
--- ApplicationID maps "Schedules", ConductedBy maps "Conducts"
 CREATE TABLE INTERVIEW (
     InterviewID     INT             NOT NULL,
     ScheduledDate   DATETIME        NOT NULL,
@@ -141,9 +139,6 @@ CREATE TABLE JOB_OFFER (
     FOREIGN KEY (ApplicationID) REFERENCES APPLICATION (ApplicationID)
         ON DELETE CASCADE ON UPDATE CASCADE );
 
--- Junction table for the M:N relationship "Sent Using".
--- SentDate is part of the key so the same template can be sent to the
--- same application more than once.
 CREATE TABLE SENT_EMAIL (
     ApplicationID   INT             NOT NULL,
     TemplateID      INT             NOT NULL,
@@ -154,12 +149,9 @@ CREATE TABLE SENT_EMAIL (
     FOREIGN KEY (TemplateID) REFERENCES EMAIL_TEMPLATE (TemplateID)
         ON DELETE RESTRICT ON UPDATE CASCADE );
 
--- =====================================================================
--- SECTION 2: SAMPLE DATA
--- =====================================================================
 
-
--- Departments (20 rows)
+--Sample Data
+-- Departments (30 rows)
 INSERT INTO DEPARTMENT (DepartmentID, Name, Location) VALUES
   (1, 'Engineering', 'Blacksburg, VA'),
   (2, 'Data Science', 'Arlington, VA'),
@@ -181,8 +173,18 @@ INSERT INTO DEPARTMENT (DepartmentID, Name, Location) VALUES
   (18, 'Research and Development', 'Blacksburg, VA'),
   (19, 'Partnerships', 'Arlington, VA'),
   (20, 'Training and Development', 'Roanoke, VA');
+  (21, 'Supply Chain', 'Roanoke, VA'),
+  (22, 'Internal Audit', 'Richmond, VA'),
+  (23, 'Public Relations', 'Arlington, VA'),
+  (24, 'Data Engineering', 'Blacksburg, VA'),
+  (25, 'Site Reliability', 'Arlington, VA'),
+  (26, 'Technical Writing', 'Roanoke, VA'),
+  (27, 'Partner Management', 'Richmond, VA'),
+  (28, 'Workplace Safety', 'Blacksburg, VA'),
+  (29, 'Revenue Operations', 'Richmond, VA'),
+  (30, 'Talent Acquisition', 'Arlington, VA');
 
--- Recruiters (20 rows)
+-- Recruiters (30 rows)
 INSERT INTO RECRUITER (EmployeeID, Name, Email) VALUES
   (101, 'Maya Thompson', 'mthompson@hiretrack.com'),
   (102, 'Daniel Okafor', 'dokafor@hiretrack.com'),
@@ -204,8 +206,18 @@ INSERT INTO RECRUITER (EmployeeID, Name, Email) VALUES
   (118, 'Peter Nowak', 'pnowak@hiretrack.com'),
   (119, 'Camille Dubois', 'cdubois@hiretrack.com'),
   (120, 'Andre Bakker', 'abakker@hiretrack.com');
+  (121, 'Imani Blake', 'iblake@hiretrack.com'),
+  (122, 'Soren Dahl', 'sdahl@hiretrack.com'),
+  (123, 'Priyanka Rao', 'prao@hiretrack.com'),
+  (124, 'Mateo Guerra', 'mguerra@hiretrack.com'),
+  (125, 'Fiona Keane', 'fkeane@hiretrack.com'),
+  (126, 'Hassan Qureshi', 'hqureshi@hiretrack.com'),
+  (127, 'Lena Kovac', 'lkovac@hiretrack.com'),
+  (128, 'Desmond Opoku', 'dopoku@hiretrack.com'),
+  (129, 'Marisol Vega', 'mvega@hiretrack.com'),
+  (130, 'Theo Lindgren', 'tlindgren@hiretrack.com');
 
--- Candidates (25 rows)
+-- Candidates (30 rows)
 INSERT INTO CANDIDATE (CandidateID, Name, Email, Type) VALUES
   (301, 'Aaron Abbott', 'aabbott@example.com', 'External'),
   (302, 'Bianca Barros', 'bbarros@example.com', 'External'),
@@ -232,6 +244,11 @@ INSERT INTO CANDIDATE (CandidateID, Name, Email, Type) VALUES
   (323, 'Wesley Whelan', 'wwhelan@example.com', 'Internal'),
   (324, 'Ximena Xiong', 'xxiong@example.com', 'Referral'),
   (325, 'Yusuf Yilmaz', 'yyilmaz@example.com', 'External');
+  (326, 'Priya Venkatesan', 'pvenkatesan@example.com', 'External'),
+  (327, 'Dominic Falk', 'dfalk@example.com', 'Referral'),
+  (328, 'Aisha Rahman', 'arahman@example.com', 'External'),
+  (329, 'Gustavo Pinto', 'gpinto@example.com', 'Internal'),
+  (330, 'Noor Al-Amin', 'nalamin@example.com', 'External');
 
 -- Hiring pipeline stages (7 rows)
 INSERT INTO HIRING_STATUS (StatusID, StatusName, StageOrder) VALUES
@@ -243,7 +260,7 @@ INSERT INTO HIRING_STATUS (StatusID, StatusName, StageOrder) VALUES
   (6, 'Hired', 6),
   (7, 'Rejected', 7);
 
--- Email templates (20 rows)
+-- Email templates (30 rows)
 INSERT INTO EMAIL_TEMPLATE (TemplateID, Subject, Body) VALUES
   (1, 'We received your application', 'Thank you for applying. Our team is reviewing your materials and will be in touch.'),
   (2, 'Next steps in your application', 'Your application has passed initial screening. A recruiter will contact you shortly.'),
@@ -265,8 +282,18 @@ INSERT INTO EMAIL_TEMPLATE (TemplateID, Subject, Body) VALUES
   (18, 'Joining our talent community', 'We would like to keep your profile for future openings.'),
   (19, 'This position has been filled', 'The role you applied for has now been filled.'),
   (20, 'How was your interview experience?', 'We would value your feedback on the interview process.');
+  (21, 'Interview confirmation', 'Your interview is confirmed. Details follow in a separate note.'),
+  (22, 'Offer letter enclosed', 'Please review the attached offer and reply by the date given.'),
+  (23, 'Reference request', 'Please share two professional references at your convenience.'),
+  (24, 'Assessment invitation', 'You are invited to complete a short skills assessment.'),
+  (25, 'Interview rescheduled', 'Your interview time has changed. The new slot is below.'),
+  (26, 'Position filled', 'This position has been filled. We will keep your details on file.'),
+  (27, 'Onboarding next steps', 'Welcome aboard. Here is what happens before your start date.'),
+  (28, 'Document request', 'Please upload the documents listed below to complete your file.'),
+  (29, 'Final round invitation', 'We would like to invite you to a final conversation.'),
+  (30, 'Thank you for interviewing', 'Thank you for your time. We will be in touch shortly.');
 
--- Hiring managers, each working in a department (20 rows)
+-- Hiring managers, each working in a department (30 rows)
 INSERT INTO HIRING_MANAGER (EmployeeID, Name, Email, DepartmentID) VALUES
   (201, 'Evelyn Shaw', 'eshaw@hiretrack.com', 1),
   (202, 'Rajesh Nair', 'rnair@hiretrack.com', 2),
@@ -288,8 +315,18 @@ INSERT INTO HIRING_MANAGER (EmployeeID, Name, Email, DepartmentID) VALUES
   (218, 'Jonah Pratt', 'jpratt@hiretrack.com', 18),
   (219, 'Sylvia Meyer', 'smeyer@hiretrack.com', 1),
   (220, 'Arjun Desai', 'adesai@hiretrack.com', 2);
+  (221, 'Rosalind Pike', 'rpike@hiretrack.com', 21),
+  (222, 'Tomas Bergstrom', 'tbergstrom@hiretrack.com', 22),
+  (223, 'Amara Diallo', 'adiallo@hiretrack.com', 23),
+  (224, 'Felix Moreau', 'fmoreau@hiretrack.com', 24),
+  (225, 'Ingrid Solberg', 'isolberg@hiretrack.com', 25),
+  (226, 'Kwame Asante', 'kasante@hiretrack.com', 26),
+  (227, 'Beatriz Lima', 'blima@hiretrack.com', 27),
+  (228, 'Yusuke Tanabe', 'ytanabe@hiretrack.com', 28),
+  (229, 'Helena Novak', 'hnovak@hiretrack.com', 29),
+  (230, 'Omar Benali', 'obenali@hiretrack.com', 30);
 
--- Analytics reports (20 rows)
+-- Analytics reports (30 rows)
 INSERT INTO ANALYTICS_REPORT (ReportID, ReportType, GeneratedDate, GeneratedBy) VALUES
   (5001, 'Time to Hire', '2026-07-01', 101),
   (5002, 'Applications per Posting', '2026-07-06', 102),
@@ -311,8 +348,18 @@ INSERT INTO ANALYTICS_REPORT (ReportID, ReportType, GeneratedDate, GeneratedBy) 
   (5018, 'Open Positions', '2026-09-24', 118),
   (5019, 'Pipeline Conversion', '2026-09-29', 119),
   (5020, 'Offer Acceptance', '2026-10-04', 120);
+  (5021, 'Source Effectiveness', '2026-09-13', 101),
+  (5022, 'Interview Load', '2026-09-15', 102),
+  (5023, 'Offer Decline Reasons', '2026-09-17', 103),
+  (5024, 'Diversity Snapshot', '2026-09-19', 104),
+  (5025, 'Requisition Ageing', '2026-09-21', 105),
+  (5026, 'Screening Throughput', '2026-09-23', 106),
+  (5027, 'Candidate Experience', '2026-09-25', 107),
+  (5028, 'Recruiter Productivity', '2026-09-27', 108),
+  (5029, 'Department Demand', '2026-10-01', 109),
+  (5030, 'Stage Drop-off', '2026-10-03', 110);
 
--- Job postings, a few have no approver yet (22 rows)
+-- Job postings, some have no approver yet (30 rows)
 INSERT INTO JOB_POSTING (JobID, Title, Description, DepartmentID, PostedBy, ApprovedBy) VALUES
   (1, 'Backend Engineer', 'Design and maintain server-side services and APIs.', 1, 102, 201),
   (2, 'Machine Learning Engineer', 'Build and deploy models that support product features.', 2, 103, 202),
@@ -336,8 +383,16 @@ INSERT INTO JOB_POSTING (JobID, Title, Description, DepartmentID, PostedBy, Appr
   (20, 'Training Specialist', 'Design and deliver internal training programs.', 20, 101, NULL),
   (21, 'Data Engineer', 'Build and maintain data pipelines and warehouses.', 1, 102, 201),
   (22, 'UX Researcher', 'Run studies that inform product and design decisions.', 2, 103, 202);
+  (23, 'Legal Counsel', 'Advise the business on contracts and compliance.', 21, 101, NULL),
+  (24, 'Customer Success Manager', 'Own renewals and account health for a portfolio.', 22, 102, NULL),
+  (25, 'Supply Chain Analyst', 'Model demand and keep supplier data accurate.', 23, 103, 223),
+  (26, 'Internal Auditor', 'Test controls and report findings to management.', 24, 104, 224),
+  (27, 'Data Engineer', 'Build and maintain the pipelines behind reporting.', 25, 105, 225),
+  (28, 'Site Reliability Engineer', 'Keep production services available and observable.', 26, 106, 226),
+  (29, 'Technical Writer', 'Write and maintain product and API documentation.', 27, 107, 227),
+  (30, 'Partner Manager', 'Grow and support the reseller partner network.', 28, 108, 228);
 
--- Applications (40 rows)
+-- Applications (64 rows)
 INSERT INTO APPLICATION (ApplicationID, SubmissionDate, ResumeLink, CandidateID, JobID, StatusID) VALUES
   (1001, '2026-07-25', 'https://files.hiretrack.com/resumes/1001.pdf', 318, 2, 2),
   (1002, '2026-06-08', 'https://files.hiretrack.com/resumes/1002.pdf', 301, 4, 2),
@@ -379,8 +434,33 @@ INSERT INTO APPLICATION (ApplicationID, SubmissionDate, ResumeLink, CandidateID,
   (1038, '2026-07-19', 'https://files.hiretrack.com/resumes/1038.pdf', 303, 22, 6),
   (1039, '2026-08-05', 'https://files.hiretrack.com/resumes/1039.pdf', 325, 6, 5),
   (1040, '2026-07-11', 'https://files.hiretrack.com/resumes/1040.pdf', 301, 10, 1);
+  (1041, '2026-10-04', 'https://files.hiretrack.com/resumes/1041.pdf', 326, 23, 6),
+  (1042, '2026-10-07', 'https://files.hiretrack.com/resumes/1042.pdf', 327, 23, 4),
+  (1043, '2026-10-10', 'https://files.hiretrack.com/resumes/1043.pdf', 328, 23, 5),
+  (1044, '2026-10-13', 'https://files.hiretrack.com/resumes/1044.pdf', 329, 24, 6),
+  (1045, '2026-10-16', 'https://files.hiretrack.com/resumes/1045.pdf', 330, 24, 3),
+  (1046, '2026-10-19', 'https://files.hiretrack.com/resumes/1046.pdf', 301, 24, 5),
+  (1047, '2026-10-22', 'https://files.hiretrack.com/resumes/1047.pdf', 302, 25, 6),
+  (1048, '2026-10-25', 'https://files.hiretrack.com/resumes/1048.pdf', 303, 25, 4),
+  (1049, '2026-10-01', 'https://files.hiretrack.com/resumes/1049.pdf', 304, 25, 2),
+  (1050, '2026-10-04', 'https://files.hiretrack.com/resumes/1050.pdf', 305, 26, 5),
+  (1051, '2026-10-07', 'https://files.hiretrack.com/resumes/1051.pdf', 306, 26, 6),
+  (1052, '2026-10-10', 'https://files.hiretrack.com/resumes/1052.pdf', 307, 26, 4),
+  (1053, '2026-10-13', 'https://files.hiretrack.com/resumes/1053.pdf', 308, 27, 5),
+  (1054, '2026-10-16', 'https://files.hiretrack.com/resumes/1054.pdf', 309, 27, 6),
+  (1055, '2026-10-19', 'https://files.hiretrack.com/resumes/1055.pdf', 310, 27, 3),
+  (1056, '2026-10-22', 'https://files.hiretrack.com/resumes/1056.pdf', 311, 28, 5),
+  (1057, '2026-10-25', 'https://files.hiretrack.com/resumes/1057.pdf', 312, 28, 6),
+  (1058, '2026-10-01', 'https://files.hiretrack.com/resumes/1058.pdf', 313, 28, 4),
+  (1059, '2026-10-04', 'https://files.hiretrack.com/resumes/1059.pdf', 314, 29, 2),
+  (1060, '2026-10-07', 'https://files.hiretrack.com/resumes/1060.pdf', 315, 29, 5),
+  (1061, '2026-10-10', 'https://files.hiretrack.com/resumes/1061.pdf', 316, 29, 6),
+  (1062, '2026-10-13', 'https://files.hiretrack.com/resumes/1062.pdf', 317, 30, 4),
+  (1063, '2026-10-16', 'https://files.hiretrack.com/resumes/1063.pdf', 318, 30, 5),
+  (1064, '2026-10-19', 'https://files.hiretrack.com/resumes/1064.pdf', 319, 30, 6);
+  
 
--- Interviews (27 rows)
+-- Interviews (51 rows)
 INSERT INTO INTERVIEW (InterviewID, ScheduledDate, Feedback, ApplicationID, ConductedBy) VALUES
   (2001, '2026-06-12 10:00:00', 'Thoughtful answers, would benefit from more leadership exposure.', 1003, 211),
   (2002, '2026-06-11 10:00:00', 'Thoughtful answers, would benefit from more leadership exposure.', 1004, 211),
@@ -409,8 +489,32 @@ INSERT INTO INTERVIEW (InterviewID, ScheduledDate, Feedback, ApplicationID, Cond
   (2025, '2026-08-01 10:00:00', 'Strong technical depth, communicates tradeoffs clearly.', 1037, 215),
   (2026, '2026-07-26 10:00:00', 'Thoughtful answers, would benefit from more leadership exposure.', 1038, 202),
   (2027, '2026-08-12 10:00:00', 'Good problem solving but struggled with follow-up questions.', 1039, 206);
+  (2028, '2026-11-02 09:30:00', 'Strong technical answers, communicates clearly.', 1041, 221),
+  (2029, '2026-11-04 10:30:00', 'Good domain knowledge, light on hands-on examples.', 1042, 221),
+  (2030, '2026-11-06 11:30:00', 'Thoughtful about trade-offs. Recommend moving forward.', 1043, 221),
+  (2031, '2026-11-08 12:30:00', 'Solid interview, would like a second opinion.', 1044, 222),
+  (2032, '2026-11-10 13:30:00', 'Clear communicator and well prepared for the role.', 1045, 222),
+  (2033, '2026-11-12 14:30:00', 'Capable, though less experience than the role needs.', 1046, 222),
+  (2034, '2026-11-14 15:30:00', NULL, 1047, 223),
+  (2035, '2026-11-16 16:30:00', 'Strong technical answers, communicates clearly.', 1048, 223),
+  (2036, '2026-11-18 09:30:00', 'Good domain knowledge, light on hands-on examples.', 1049, 223),
+  (2037, '2026-11-20 10:30:00', 'Thoughtful about trade-offs. Recommend moving forward.', 1050, 224),
+  (2038, '2026-11-22 11:30:00', 'Solid interview, would like a second opinion.', 1051, 224),
+  (2039, '2026-11-24 12:30:00', 'Clear communicator and well prepared for the role.', 1052, 224),
+  (2040, '2026-11-26 13:30:00', 'Capable, though less experience than the role needs.', 1053, 225),
+  (2041, '2026-11-02 14:30:00', NULL, 1054, 225),
+  (2042, '2026-11-04 15:30:00', 'Strong technical answers, communicates clearly.', 1055, 225),
+  (2043, '2026-11-06 16:30:00', 'Good domain knowledge, light on hands-on examples.', 1056, 226),
+  (2044, '2026-11-08 09:30:00', 'Thoughtful about trade-offs. Recommend moving forward.', 1057, 226),
+  (2045, '2026-11-10 10:30:00', 'Solid interview, would like a second opinion.', 1058, 226),
+  (2046, '2026-11-12 11:30:00', 'Clear communicator and well prepared for the role.', 1059, 227),
+  (2047, '2026-11-14 12:30:00', 'Capable, though less experience than the role needs.', 1060, 227),
+  (2048, '2026-11-16 13:30:00', NULL, 1061, 227),
+  (2049, '2026-11-18 14:30:00', 'Strong technical answers, communicates clearly.', 1062, 228),
+  (2050, '2026-11-20 15:30:00', 'Good domain knowledge, light on hands-on examples.', 1063, 228),
+  (2051, '2026-11-22 16:30:00', 'Thoughtful about trade-offs. Recommend moving forward.', 1064, 228);
 
--- Candidate rankings (33 rows)
+-- Candidate rankings (57 rows)
 INSERT INTO CANDIDATE_RANKING (RankingID, Score, RankPosition, ApplicationID) VALUES
   (3001, 76.43, 1, 1005),
   (3002, 72.85, 2, 1023),
@@ -445,8 +549,32 @@ INSERT INTO CANDIDATE_RANKING (RankingID, Score, RankPosition, ApplicationID) VA
   (3031, 58.47, 1, 1029),
   (3032, 56.14, 1, 1035),
   (3033, 91.44, 1, 1038);
+  (3034, 91.20, 1, 1041),
+  (3035, 84.10, 2, 1043),
+  (3036, 78.45, 3, 1042),
+  (3037, 88.75, 1, 1045),
+  (3038, 72.60, 2, 1046),
+  (3039, 67.30, 3, 1044),
+  (3040, 95.05, 1, 1047),
+  (3041, 80.90, 2, 1048),
+  (3042, 69.85, 3, 1049),
+  (3043, 90.30, 1, 1052),
+  (3044, 86.40, 2, 1050),
+  (3045, 74.15, 3, 1051),
+  (3046, 83.55, 1, 1054),
+  (3047, 77.00, 2, 1053),
+  (3048, 65.70, 3, 1055),
+  (3049, 92.85, 1, 1056),
+  (3050, 91.20, 2, 1057),
+  (3051, 78.45, 3, 1058),
+  (3052, 88.75, 1, 1061),
+  (3053, 84.10, 2, 1059),
+  (3054, 67.30, 3, 1060),
+  (3055, 95.05, 1, 1063),
+  (3056, 80.90, 2, 1064),
+  (3057, 72.60, 3, 1062);
 
--- Job offers (20 rows)
+-- Job offers (30 rows)
 INSERT INTO JOB_OFFER (OfferID, Salary, StartDate, ApplicationID) VALUES
   (4001, 162115.87, '2026-09-14', 1003),
   (4002, 158583.04, '2026-11-01', 1005),
@@ -468,8 +596,18 @@ INSERT INTO JOB_OFFER (OfferID, Salary, StartDate, ApplicationID) VALUES
   (4018, 128283.77, '2026-10-27', 1037),
   (4019, 131581.8, '2026-10-23', 1038),
   (4020, 83469.92, '2026-11-19', 1039);
+  (4021, 112400.00, '2027-01-05', 1041),
+  (4022, 98750.50, '2027-02-07', 1043),
+  (4023, 134900.00, '2027-03-09', 1044),
+  (4024, 121300.75, '2027-01-11', 1046),
+  (4025, 87650.00, '2027-02-13', 1047),
+  (4026, 145200.00, '2027-03-15', 1050),
+  (4027, 103800.25, '2027-01-17', 1051),
+  (4028, 118950.00, '2027-02-19', 1053),
+  (4029, 92400.00, '2027-03-21', 1054),
+  (4030, 127600.50, '2027-01-23', 1056);
 
--- Sent emails (40 rows)
+-- Sent emails (54 rows)
 INSERT INTO SENT_EMAIL (ApplicationID, TemplateID, SentDate) VALUES
   (1001, 1, '2026-07-25 09:15:00'),
   (1002, 1, '2026-06-08 09:15:00'),
@@ -511,20 +649,22 @@ INSERT INTO SENT_EMAIL (ApplicationID, TemplateID, SentDate) VALUES
   (1038, 1, '2026-07-19 09:15:00'),
   (1039, 1, '2026-08-05 09:15:00'),
   (1040, 1, '2026-07-11 09:15:00');
+  (1003, 3, '2026-11-03 09:15:00'),
+  (1004, 6, '2026-11-05 10:15:00'),
+  (1005, 9, '2026-11-07 11:15:00'),
+  (1007, 12, '2026-11-09 12:15:00'),
+  (1008, 15, '2026-11-11 13:15:00'),
+  (1010, 18, '2026-11-13 14:15:00'),
+  (1011, 21, '2026-11-15 15:15:00'),
+  (1012, 24, '2026-11-17 16:15:00'),
+  (1013, 27, '2026-11-19 09:15:00'),
+  (1014, 30, '2026-11-21 10:15:00'),
+  (1015, 3, '2026-11-23 11:15:00'),
+  (1017, 6, '2026-11-25 12:15:00'),
+  (1021, 9, '2026-11-27 13:15:00'),
+  (1022, 12, '2026-11-04 14:15:00');
 
--- =====================================================================
--- SECTION 4: USER ACCOUNTS  (final phase - user support)
--- Application users live in the database, not in the source code.
--- Passwords are stored only as a hash, never in plain text.
--- A user is linked to the person they are: a Candidate row, a
--- Recruiter row or a Hiring Manager row. An Admin is linked to none.
---
--- Note: MySQL forbids ON DELETE / ON UPDATE referential actions on a
--- column that a CHECK constraint also inspects, so these three foreign
--- keys use the default (RESTRICT). A person row therefore cannot be
--- deleted while a login still points at it.
--- =====================================================================
-
+-- User Accounts
 CREATE TABLE USER_ACCOUNT (
     UserID          INT             NOT NULL,
     Username        VARCHAR(40)     NOT NULL,
@@ -538,7 +678,6 @@ CREATE TABLE USER_ACCOUNT (
     ManagerID       INT,
     PRIMARY KEY (UserID),
     UNIQUE (Username),
-    -- exactly one person link, and it has to match the role
     CONSTRAINT chk_user_role_link CHECK (
         (Role = 'Candidate'
              AND CandidateID IS NOT NULL
@@ -558,22 +697,15 @@ CREATE TABLE USER_ACCOUNT (
     FOREIGN KEY (ManagerID)   REFERENCES HIRING_MANAGER (EmployeeID)
 ) ;
 
--- The first admin is the only account created by hand. Everyone else
--- signs up through the application, and admins are created in-app by
--- an existing admin.
 --   username: admin
---   password: admin123   <- MustChangePassword = 1 forces a reset at first login
+--   password: admin123   
 INSERT INTO USER_ACCOUNT
     (UserID, Username, PasswordHash, Role, MustChangePassword,
      CandidateID, RecruiterID, ManagerID) VALUES
   (1, 'admin', 'pbkdf2:sha256:1000000$t87NE6nMWxWLxIAt$a0d08e85a95f3c198a2843b0c42022de9af4a959662aead6e430e8433190e933', 'Admin', 1, NULL, NULL, NULL);
 
 
--- =====================================================================
--- SECTION 3: VERIFICATION QUERIES
--- Highlight one query and press Ctrl+Enter to run just that one.
--- =====================================================================
-
+-- Verification Queries
 -- Q1: How many tuples are in each table?
 SELECT 'DEPARTMENT' AS TableName, COUNT(*) AS NumRows FROM DEPARTMENT
 UNION ALL SELECT 'RECRUITER',         COUNT(*) FROM RECRUITER
