@@ -1,24 +1,14 @@
--- =====================================================================
--- HireTrack: An Integrated Recruitment Database System
--- CS 4604 - Team 4 (Sanju Devakumaran, Ruthika Reddy)
--- Phase 1: Schema creation and sample data
--- DBMS: MySQL 8.0
---
--- 14 relations, 14 primary keys, 17 foreign keys.
--- Uses only Chapter 4 features: CREATE TABLE, data types, NOT NULL,
--- DEFAULT, UNIQUE, CHECK, PRIMARY KEY, FOREIGN KEY with referential
--- integrity options, INSERT, and SELECT-FROM-WHERE.
--- =====================================================================
+
+HireTrack: An Integrated Recruitment Database System
+Team 4 (Sanju Devakumaran, Ruthika Reddy)
+DBMS: MySQL 8.0
+
 
 DROP DATABASE IF EXISTS hiretrack;
 CREATE DATABASE hiretrack;
 USE hiretrack;
 
--- =====================================================================
--- SECTION 1: TABLE DEFINITIONS
--- Tables are created parent-first so every FOREIGN KEY refers to a
--- table that already exists.
--- =====================================================================
+
 
 CREATE TABLE DEPARTMENT (
     DepartmentID    INT             NOT NULL,
