@@ -1,39 +1,11 @@
 """
 HireTrack - reporting facility
-CS 4604 Team 4 (Sanju Devakumaran, Ruthika Reddy)
+Team 4 - Sanju Devakumaran and Ruthika Reddy
 
 Final phase, reporting requirement: statistical reports built with the
-aggregate functions from the course notes. All five are used, and the
-table below says which report uses which:
+aggregate functions from the course notes (COUNT, MIN, MAX, AVG, SUM).
 
-    COUNT   every report
-    MIN     department funnel, posting performance, salary summary,
-            email activity, my application summary, my interview record,
-            my applications by department
-    MAX     department funnel, posting performance, salary summary,
-            email activity, candidate sources, my application summary,
-            my interview record, my applications by department
-    AVG     department funnel, posting performance, salary summary,
-            interviewer workload, candidate sources,
-            my application summary, my applications by department
-    SUM     salary summary, my application summary
 
-Each report is declared once, in the REPORTS table: its title, the roles
-allowed to run it, the column headings, and one SELECT statement. Two
-endpoints then serve all of them, so the interface needs a single report
-screen rather than one screen per report.
-
-Reports available to each kind of user:
-    Admin            8      Recruiter   6
-    Hiring Manager   5      Candidate   5
-
-Only constructs from the course notes appear in the SQL:
-    SELECT ... FROM ... WHERE, ORDER BY, aliases     (Chapter 4)
-    INNER JOIN / LEFT OUTER JOIN ... ON              (Chapter 5)
-    COUNT, MIN, MAX, AVG, SUM                        (Chapter 5)
-    GROUP BY ... HAVING                              (Chapter 5)
-
-This module is imported by app.py; it registers its routes on the app.
 """
 
 from flask import jsonify
@@ -42,11 +14,6 @@ ALL_STAFF = ("Admin", "Recruiter", "Hiring Manager")
 EVERYONE = ("Admin", "Recruiter", "Hiring Manager", "Candidate")
 
 
-# =======================================================================
-# The reports. `needs` names a value taken from the signed-in user and
-# passed to the statement as a parameter, so a candidate's own report can
-# only ever return that candidate's rows.
-# =======================================================================
 REPORTS = [
  {
   "id": "pipeline",
