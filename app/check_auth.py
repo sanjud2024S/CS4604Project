@@ -1,19 +1,16 @@
 #!/usr/bin/env python3
 """
 HireTrack - authentication check
-CS 4604 Team 4
+Team 4 - Sanju Devakumaran and Ruthika Reddy
 
 Exercises the running Flask API against the real MySQL database and
 prints what happened, so the user-support requirements can be seen
 working end to end.
 
-Start the server first in another Command Prompt:
+Start the server first in another Command Prompt and run:
     python app.py
-
-Then run:
     python check_auth.py
 
-Uses only the Python standard library.
 """
 
 import json
