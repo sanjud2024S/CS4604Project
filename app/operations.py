@@ -1,46 +1,10 @@
 """
 HireTrack - operation-oriented task screens
-CS 4604 Team 4 (Sanju Devakumaran, Ruthika Reddy)
+Team 4 - Sanju Devakumaran and Ruthika Reddy
 
 Final phase, system functionality requirement. Every item on a role's menu
 has a real operation behind it here, and each one works on the database:
 
-  Candidate        Browse jobs              SELECT with joins
-                   Apply to a job           INSERT INTO APPLICATION
-                   Track my applications    SELECT with outer joins
-                   Withdraw an application  DELETE FROM APPLICATION
-                   My interviews            SELECT with joins
-
-  Recruiter        Post a job               INSERT INTO JOB_POSTING
-                   Review applications      SELECT + UPDATE APPLICATION
-                   Schedule interviews      INSERT INTO INTERVIEW
-                   Send status emails       INSERT INTO SENT_EMAIL
-                   View ranked candidates   SELECT ... ORDER BY
-
-  Hiring Manager   Approve postings         UPDATE JOB_POSTING
-                   Review shortlist         SELECT with joins
-                   Record interview feedback UPDATE INTERVIEW
-                   Make offers              INSERT INTO JOB_OFFER + UPDATE
-
-  Admin            Manage email templates   SELECT / INSERT / DELETE
-                   Manage departments       SELECT / INSERT / DELETE
-
-Two rules are followed throughout:
-
-  1. Users never type an ID. Every list sends back the person's name, the
-     job title or the status name next to the id, so the interface can show
-     a drop-down of names and post back the id behind it.
-  2. Only SQL from the course notes is used:
-        SELECT ... FROM ... WHERE                       (Chapter 4)
-        INSERT INTO ... VALUES / DELETE / UPDATE        (Chapter 4)
-        ORDER BY, LIKE, aliases                        (Chapter 4)
-        INNER JOIN / LEFT OUTER JOIN ... ON            (Chapter 5)
-        nested queries with IN / NOT IN / EXISTS       (Chapter 5)
-        COUNT, MAX                                     (Chapter 5)
-     Dates are worked out in Python and passed as parameters, so no MySQL
-     date function is needed.
-
-This module is imported by app.py; it registers its routes on the app.
 """
 
 from datetime import date, datetime
@@ -53,7 +17,6 @@ SUBMITTED, UNDER_REVIEW, SCREENING, INTERVIEWING, \
     OFFER_EXTENDED, HIRED, REJECTED = 1, 2, 3, 4, 5, 6, 7
 
 
-# ----------------------------------------------------------------- helpers
 def _j(v):
     """Dates, datetimes and Decimals are not JSON types."""
     if v is None or isinstance(v, (int, float, str)):
@@ -133,9 +96,6 @@ def register(app, connect):
         run.__name__ = fn.__name__
         return run
 
-    # ===================================================================
-    # LOOKUPS - the drop-downs, so nobody has to memorise an ID
-    # ===================================================================
     @app.get("/api/lookups/departments")
     @roles_required("Admin", "Recruiter", "Hiring Manager")
     @db
@@ -181,9 +141,7 @@ def register(app, connect):
         return jsonify({"templates": [{"id": r[0], "subject": r[1]}
                                       for r in cur.fetchall()]})
 
-    # ===================================================================
-    # CANDIDATE
-    # ===================================================================
+   
     @app.get("/api/candidate/jobs")
     @roles_required("Candidate")
     @db
@@ -327,9 +285,7 @@ def register(app, connect):
         return jsonify(_table(cur, ["Scheduled", "Job title",
                                     "Interviewer", "Feedback"]))
 
-    # ===================================================================
-    # RECRUITER
-    # ===================================================================
+    
     @app.post("/api/recruiter/jobs")
     @roles_required("Recruiter")
     @db
@@ -583,9 +539,7 @@ def register(app, connect):
         return jsonify(_table(cur, ["Job title", "Rank", "Candidate",
                                     "Score", "Status"]))
 
-    # ===================================================================
-    # HIRING MANAGER
-    # ===================================================================
+    
     @app.get("/api/manager/pending-postings")
     @roles_required("Hiring Manager")
     @db
@@ -798,9 +752,7 @@ def register(app, connect):
         return jsonify(_table(cur, ["Offer", "Candidate", "Job title",
                                     "Salary", "Start date", "Status"]))
 
-    # ===================================================================
-    # ADMIN - reference data behind the remaining two menu items
-    # ===================================================================
+    
     @app.get("/api/admin/templates")
     @roles_required("Admin")
     @db
