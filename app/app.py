@@ -1,36 +1,9 @@
 """
 HireTrack - Flask REST API (backend)
-CS 4604 Team 4 (Sanju Devakumaran, Ruthika Reddy)
+Team 4 - Sanju Devakumaran and Ruthika Reddy
 
-Built on the CS 4604 DBMS Connection Demo (Huayu Liang, GTA, 10/15/2026):
-same Flask + mysql-connector-python + .env structure, same CRUD endpoint
-layout. The demo's React frontend is replaced by a single HTML page that
-Flask serves itself, so only one server has to run.
-
-Requirements covered here:
-  the interface is connected to the database  -> GET  /api/status
-  insert functionality                        -> POST /api/table/<table>
-  delete functionality                        -> DELETE /api/table/<table>
-
-The rest of the backend is split across three modules that register their
-own routes on this app:
-
-    auth.py        logging in, signing up, changing a password, and the
-                   Admin screens for managing user accounts
-    operations.py  the task screen behind every item on a role's menu
-                   (apply to a job, post a job, schedule an interview,
-                   approve a posting, make an offer, and so on)
-    reports.py     the statistical reports, built with COUNT, MIN, MAX,
-                   AVG and SUM
-
-The generic table routes below are an administrator maintenance area;
-ordinary users reach the data through the task screens instead.
-
-Every statement sent to MySQL uses only constructs from the course notes:
-    INSERT INTO ... VALUES      (Chapter 4)
-    DELETE FROM ... WHERE       (Chapter 4)
-    SELECT * FROM               (Chapter 4)
-    SELECT COUNT(*) / MAX(...)  (Chapter 5 aggregate functions)
+Built using DBMS Connection Demo: same Flask + mysql-connector-python + .env structure, same CRUD endpoint
+layout. Includes connection to database & insert/delete functionality. 
 
 Run:
     pip install flask mysql-connector-python python-dotenv
@@ -47,7 +20,7 @@ import auth
 import operations
 import reports
 
-# credentials live in .env, never in the source - Step 5.1 of the demo
+# credentials in .env
 try:
     from dotenv import load_dotenv
     load_dotenv()
@@ -65,15 +38,13 @@ DB_CONFIG = {
 HERE = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__, static_folder=None)
 
-# Signing key for the login session cookie. Set SECRET_KEY in .env so
-# sessions survive a restart; otherwise a random one is used each run.
 app.secret_key = os.getenv("SECRET_KEY") or secrets.token_hex(32)
 
 
-# ===========================================================================
+
 # SCHEMA - written out from the Phase 1 relational schema
 # each column: (name, hint, required?, primary key?, referenced table)
-# ===========================================================================
+
 SCHEMA = {
  "DEPARTMENT": [
     ("DepartmentID",  "INT",            True,  True,  None),
@@ -163,7 +134,6 @@ def primary_key(table):
     return [c[0] for c in SCHEMA[table] if c[3]]
 
 
-# =========================================================== SQL builders
 def build_insert(table, values):
     """INSERT INTO t (cols) VALUES (...)   - Chapter 4.
     Blank fields are dropped so the column keeps its DEFAULT or NULL."""
@@ -204,7 +174,7 @@ def preview(sql, params):
     return "".join(out)
 
 
-# ================================================================ database
+
 def connect():
     """Step 5 of the demo: Flask opens a MySQL connection with the
     credentials from .env."""
@@ -230,7 +200,6 @@ def jsonable(v):
     return str(v)
 
 
-# ================================================================== routes
 @app.get("/")
 def home():
     return send_from_directory(HERE, "index.html")
