@@ -1,24 +1,15 @@
 """
 HireTrack - authentication and user management
-CS 4604 Team 4 (Sanju Devakumaran, Ruthika Reddy)
+Team 4 - Sanju Devakumaran and Ruthika Redd
 
-Final phase, user support requirement:
+Final phase, user support:
   - different types of users: Admin, Recruiter, Hiring Manager, Candidate
   - no hardcoded passwords; accounts live in the USER_ACCOUNT table
   - every user has a username and a password
   - sign up, log in, log out, change password
-  - only the first admin is created by hand (in hiretrack.sql); after
+  - only the first admin is created by hand, after
     that an admin creates other admins through the application
-  - passwords are stored as a salted pbkdf2 hash, never in plain text
 
-Only SQL from the course notes is used:
-    SELECT ... FROM ... WHERE      (Chapter 4)
-    INSERT INTO ... VALUES         (Chapter 4)
-    UPDATE ... SET ... WHERE       (Chapter 4)
-    SELECT MAX(...), COUNT(*)      (Chapter 5 aggregates)
-    NOT IN (nested query)          (Chapter 5)
-
-This module is imported by app.py; it registers its routes on the app.
 """
 
 from functools import wraps
@@ -29,8 +20,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 MIN_PASSWORD_LENGTH = 8
 
-# Which menu items each role may reach. The frontend renders these as a
-# task menu; the backend uses the same table to guard its routes.
 ROLE_MENUS = {
     "Recruiter": [
         "Post a job", "Review applications", "Schedule interviews",
@@ -58,7 +47,6 @@ LINK = {
 }
 
 
-# ----------------------------------------------------------------- helpers
 def _next_id(cur, table, pk):
     cur.execute(f"SELECT MAX({pk}) FROM {table}")
     top = cur.fetchone()[0]
@@ -149,7 +137,6 @@ def register(app, connect):
     app.login_required = login_required
     app.roles_required = roles_required
 
-    # ---- log in / out --------------------------------------------------
     @app.post("/api/login")
     def login():
         data = request.get_json(silent=True) or {}
@@ -187,7 +174,7 @@ def register(app, connect):
             return jsonify({"error": "Not signed in."}), 401
         return jsonify(user)
 
-    # ---- sign up -------------------------------------------------------
+    
     @app.post("/api/signup")
     def signup():
         """Public sign-up creates a Candidate: a new person applying for
@@ -237,7 +224,7 @@ def register(app, connect):
         finally:
             cur.close(); cx.close()
 
-    # ---- change password -----------------------------------------------
+    
     @app.post("/api/change-password")
     @login_required
     def change_password(user):
@@ -267,7 +254,7 @@ def register(app, connect):
         finally:
             cur.close(); cx.close()
 
-    # ---- admin: manage users -------------------------------------------
+    
     @app.get("/api/admin/users")
     @roles_required("Admin")
     def list_users(user):
