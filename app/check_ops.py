@@ -1,33 +1,17 @@
 #!/usr/bin/env python3
 """
 HireTrack - system functionality and reporting check
-CS 4604 Team 4
+Team 4 - Sanju Devakumaran and Ruthika Reddy
 
 Walks one candidate all the way through hiring, using only the API that
 the GUI uses, and then runs every statistical report for every kind of
-user. Nothing is set up by hand: the accounts, the job, the application,
-the interview and the offer are all created through the application while
-this runs, so the output is evidence that the operations work.
+user. 
 
-    an admin creates a recruiter and a hiring manager login
-    the recruiter posts a job
-    the hiring manager approves it
-    a candidate signs up, finds the job and applies
-    the recruiter screens them and emails them
-    the recruiter books an interview with the hiring manager
-    the hiring manager records feedback and makes an offer
-    the candidate sees the offer on their own screen
-    every role runs its reports
-    every role is refused the other roles' operations
-
-Start the server first in another Command Prompt:
+Start the server first in another Command Prompt and run:
     python app.py
+    python check_ops.py                 (admin password = admin123)
+    python check_ops.py MyAdminPass     (if changed)
 
-Then run:
-    python check_ops.py                 (admin password admin123)
-    python check_ops.py MyAdminPass     (if it has been changed)
-
-Uses only the Python standard library.
 """
 
 import json
@@ -107,14 +91,14 @@ print(BAR)
 print("  HireTrack - system functionality and reporting check")
 print(BAR)
 
-# ---------------------------------------------------------------- 1. server
+# server
 print("\n1. The server is up and connected to MySQL")
 admin = Session("admin")
 s, d = admin.get("/api/status")
 step("GET /api/status", s, d, 200,
      show=f"{d.get('dbms')} - {d.get('database')}")
 
-# ---------------------------------------------------------------- 2. admin
+# admin
 print("\n2. The administrator signs in")
 for pw in ADMIN_TRIES:
     s, d = admin.post("/api/login", {"username": "admin", "password": pw})
@@ -132,7 +116,7 @@ if d.get("must_change_password"):
     step("the forced password change is completed", s, d, 200,
          show=f"must change password is now {d.get('must_change_password')}")
 
-# ------------------------------------------------- 3. admin creates staff
+# admin creates staff
 print("\n3. The administrator creates the staff logins, choosing people "
       "by name")
 s, d = admin.get("/api/admin/unlinked?role=Recruiter")
@@ -167,7 +151,7 @@ s, d = admin.post("/api/admin/create-user",
 step(f"a Hiring Manager login for {mgr_person['name']}", s, d, 200,
      show=f"username {mgr_user}")
 
-# ------------------------------------------------- 4. recruiter posts a job
+# recruiter posts a job
 print("\n4. The recruiter signs in and posts a job")
 rec = Session("recruiter")
 s, d = rec.post("/api/login", {"username": rec_user, "password": PASSWORD})
@@ -200,7 +184,7 @@ job_id = d.get("job_id")
 if not job_id:
     stop("the job was not created")
 
-# ---------------------------------------------- 5. manager approves the job
+# manager approves the job
 print("\n5. The hiring manager signs in and approves the posting")
 mgr = Session("manager")
 s, d = mgr.post("/api/login", {"username": mgr_user, "password": PASSWORD})
@@ -220,7 +204,7 @@ step("Approve postings  ->  the new job is waiting", s, d, 200,
 s, d = mgr.post("/api/manager/approve-posting", {"job_id": job_id})
 step("Approve the posting  ->  UPDATE JOB_POSTING", s, d, 200)
 
-# ----------------------------------------------- 6. candidate applies
+# candidate applies
 print("\n6. A candidate signs up, finds the job and applies")
 cand = Session("candidate")
 s, d = cand.post("/api/signup",
@@ -248,7 +232,7 @@ app_id = d.get("application_id")
 s, d = cand.post("/api/candidate/apply", {"job_id": job_id})
 step("applying a second time is refused", s, d, 400)
 
-# -------------------------------------------- 7. recruiter screens them
+# recruiter screens them
 print("\n7. The recruiter reviews the application and moves it along")
 s, d = rec.get("/api/recruiter/applications")
 mine = [r for r in d.get("rows", []) if r[0] == app_id]
@@ -276,7 +260,7 @@ s, d = rec.post("/api/recruiter/send-email",
                 {"application_id": app_id, "template_id": template["id"]})
 step("Send a status email  ->  INSERT INTO SENT_EMAIL", s, d, 200)
 
-# ------------------------------------------ 8. recruiter books interview
+# recruiter books interview
 print("\n8. The recruiter books the interview with the hiring manager")
 s, d = rec.get("/api/recruiter/schedulable")
 ready = [a for a in d.get("applications", []) if a["id"] == app_id]
@@ -290,7 +274,7 @@ s, d = rec.post("/api/recruiter/interviews",
 step("Schedule an interview  ->  INSERT INTO INTERVIEW", s, d, 200)
 interview_id = d.get("interview_id")
 
-# ------------------------------- 9. manager gives feedback, makes an offer
+# manager gives feedback, makes an offer
 print("\n9. The hiring manager records feedback and makes the offer")
 s, d = mgr.get("/api/manager/interviews")
 ours = [i for i in d.get("interviews", []) if i["id"] == interview_id]
@@ -321,7 +305,7 @@ s, d = mgr.post("/api/manager/offers",
                 {"application_id": app_id, "salary": 1, "start_date": start})
 step("a second offer on the same application is refused", s, d, 400)
 
-# -------------------------------------- 10. candidate sees the outcome
+# candidate sees the outcome
 print("\n10. The candidate sees the result on their own screen")
 s, d = cand.get("/api/candidate/applications")
 row = [r for r in d.get("rows", []) if r[0] == app_id]
@@ -337,7 +321,7 @@ step("My interviews  ->  the booked interview and its feedback", s, d, 200,
 if d.get("rows"):
     print(f"         {d['rows'][0]}")
 
-# ---------------------------------------------------------- 11. reports
+# reports
 print("\n11. Every role runs its statistical reports")
 for label, sess in (("Admin", admin), ("Recruiter", rec),
                     ("Hiring Manager", mgr), ("Candidate", cand)):
@@ -357,7 +341,7 @@ for label, sess in (("Admin", admin), ("Recruiter", rec),
             if d2["row_count"] > 3:
                 print(f"         ... {d2['row_count'] - 3} more row(s)")
 
-# ------------------------------------------------- 12. role separation
+# role separation
 print("\n12. No role can reach another role's operations")
 checks = [
     ("a Candidate cannot review applications", cand, "GET",
