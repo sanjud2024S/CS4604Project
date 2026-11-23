@@ -1,0 +1,18 @@
+CS 4604 Final Project - Hiretrack
+Team 4
+
+DBMS: MySQL 8.0
+Interface language: Python 3 (Flask REST API)
+Frontend: HTML & JavaScript
+DBMS Tool: MySQL Workbench
+
+Github Repo: 
+
+Team Members:
+1. Sanju Devakumaran:
+- sanjud@vt.edu
+- Contributions: Database design and backend, ER diagram and relational schema
+
+2. Ruthika Reddy: 
+- ruthikar@vt.edu
+- Contributions: User interface, ER diagram and relational schema 
