@@ -1,7 +1,6 @@
-
-HireTrack: An Integrated Recruitment Database System
-Team 4 (Sanju Devakumaran, Ruthika Reddy)
-DBMS: MySQL 8.0
+-- HireTrack: An Integrated Recruitment Database System
+-- Team 4 (Sanju Devakumaran, Ruthika Reddy)
+-- DBMS: MySQL 8.0
 
 
 DROP DATABASE IF EXISTS hiretrack;
@@ -162,7 +161,7 @@ INSERT INTO DEPARTMENT (DepartmentID, Name, Location) VALUES
   (17, 'Procurement', 'Richmond, VA'),
   (18, 'Research and Development', 'Blacksburg, VA'),
   (19, 'Partnerships', 'Arlington, VA'),
-  (20, 'Training and Development', 'Roanoke, VA');
+  (20, 'Training and Development', 'Roanoke, VA'),
   (21, 'Supply Chain', 'Roanoke, VA'),
   (22, 'Internal Audit', 'Richmond, VA'),
   (23, 'Public Relations', 'Arlington, VA'),
@@ -195,7 +194,7 @@ INSERT INTO RECRUITER (EmployeeID, Name, Email) VALUES
   (117, 'Yara Mansour', 'ymansour@hiretrack.com'),
   (118, 'Peter Nowak', 'pnowak@hiretrack.com'),
   (119, 'Camille Dubois', 'cdubois@hiretrack.com'),
-  (120, 'Andre Bakker', 'abakker@hiretrack.com');
+  (120, 'Andre Bakker', 'abakker@hiretrack.com'),
   (121, 'Imani Blake', 'iblake@hiretrack.com'),
   (122, 'Soren Dahl', 'sdahl@hiretrack.com'),
   (123, 'Priyanka Rao', 'prao@hiretrack.com'),
@@ -233,7 +232,7 @@ INSERT INTO CANDIDATE (CandidateID, Name, Email, Type) VALUES
   (322, 'Valeria Vasquez', 'vvasquez@example.com', 'External'),
   (323, 'Wesley Whelan', 'wwhelan@example.com', 'Internal'),
   (324, 'Ximena Xiong', 'xxiong@example.com', 'Referral'),
-  (325, 'Yusuf Yilmaz', 'yyilmaz@example.com', 'External');
+  (325, 'Yusuf Yilmaz', 'yyilmaz@example.com', 'External'),
   (326, 'Priya Venkatesan', 'pvenkatesan@example.com', 'External'),
   (327, 'Dominic Falk', 'dfalk@example.com', 'Referral'),
   (328, 'Aisha Rahman', 'arahman@example.com', 'External'),
@@ -271,7 +270,7 @@ INSERT INTO EMAIL_TEMPLATE (TemplateID, Subject, Body) VALUES
   (17, 'Sorry to see you go', 'We have recorded your decision to decline the offer. We wish you well.'),
   (18, 'Joining our talent community', 'We would like to keep your profile for future openings.'),
   (19, 'This position has been filled', 'The role you applied for has now been filled.'),
-  (20, 'How was your interview experience?', 'We would value your feedback on the interview process.');
+  (20, 'How was your interview experience?', 'We would value your feedback on the interview process.'),
   (21, 'Interview confirmation', 'Your interview is confirmed. Details follow in a separate note.'),
   (22, 'Offer letter enclosed', 'Please review the attached offer and reply by the date given.'),
   (23, 'Reference request', 'Please share two professional references at your convenience.'),
@@ -304,7 +303,7 @@ INSERT INTO HIRING_MANAGER (EmployeeID, Name, Email, DepartmentID) VALUES
   (217, 'Wendy Carlisle', 'wcarlisle@hiretrack.com', 17),
   (218, 'Jonah Pratt', 'jpratt@hiretrack.com', 18),
   (219, 'Sylvia Meyer', 'smeyer@hiretrack.com', 1),
-  (220, 'Arjun Desai', 'adesai@hiretrack.com', 2);
+  (220, 'Arjun Desai', 'adesai@hiretrack.com', 2),
   (221, 'Rosalind Pike', 'rpike@hiretrack.com', 21),
   (222, 'Tomas Bergstrom', 'tbergstrom@hiretrack.com', 22),
   (223, 'Amara Diallo', 'adiallo@hiretrack.com', 23),
@@ -337,7 +336,7 @@ INSERT INTO ANALYTICS_REPORT (ReportID, ReportType, GeneratedDate, GeneratedBy) 
   (5017, 'Applications per Posting', '2026-09-19', 117),
   (5018, 'Open Positions', '2026-09-24', 118),
   (5019, 'Pipeline Conversion', '2026-09-29', 119),
-  (5020, 'Offer Acceptance', '2026-10-04', 120);
+  (5020, 'Offer Acceptance', '2026-10-04', 120),
   (5021, 'Source Effectiveness', '2026-09-13', 101),
   (5022, 'Interview Load', '2026-09-15', 102),
   (5023, 'Offer Decline Reasons', '2026-09-17', 103),
@@ -372,7 +371,7 @@ INSERT INTO JOB_POSTING (JobID, Title, Description, DepartmentID, PostedBy, Appr
   (19, 'Partnerships Manager', 'Develop and manage strategic partner relationships.', 19, 120, NULL),
   (20, 'Training Specialist', 'Design and deliver internal training programs.', 20, 101, NULL),
   (21, 'Data Engineer', 'Build and maintain data pipelines and warehouses.', 1, 102, 201),
-  (22, 'UX Researcher', 'Run studies that inform product and design decisions.', 2, 103, 202);
+  (22, 'UX Researcher', 'Run studies that inform product and design decisions.', 2, 103, 202),
   (23, 'Legal Counsel', 'Advise the business on contracts and compliance.', 21, 101, NULL),
   (24, 'Customer Success Manager', 'Own renewals and account health for a portfolio.', 22, 102, NULL),
   (25, 'Supply Chain Analyst', 'Model demand and keep supplier data accurate.', 23, 103, 223),
@@ -423,7 +422,7 @@ INSERT INTO APPLICATION (ApplicationID, SubmissionDate, ResumeLink, CandidateID,
   (1037, '2026-07-25', 'https://files.hiretrack.com/resumes/1037.pdf', 323, 15, 5),
   (1038, '2026-07-19', 'https://files.hiretrack.com/resumes/1038.pdf', 303, 22, 6),
   (1039, '2026-08-05', 'https://files.hiretrack.com/resumes/1039.pdf', 325, 6, 5),
-  (1040, '2026-07-11', 'https://files.hiretrack.com/resumes/1040.pdf', 301, 10, 1);
+  (1040, '2026-07-11', 'https://files.hiretrack.com/resumes/1040.pdf', 301, 10, 1),
   (1041, '2026-10-04', 'https://files.hiretrack.com/resumes/1041.pdf', 326, 23, 6),
   (1042, '2026-10-07', 'https://files.hiretrack.com/resumes/1042.pdf', 327, 23, 4),
   (1043, '2026-10-10', 'https://files.hiretrack.com/resumes/1043.pdf', 328, 23, 5),
@@ -478,7 +477,7 @@ INSERT INTO INTERVIEW (InterviewID, ScheduledDate, Feedback, ApplicationID, Cond
   (2024, '2026-07-27 10:00:00', 'Excellent collaboration signals, moderate domain knowledge.', 1036, 217),
   (2025, '2026-08-01 10:00:00', 'Strong technical depth, communicates tradeoffs clearly.', 1037, 215),
   (2026, '2026-07-26 10:00:00', 'Thoughtful answers, would benefit from more leadership exposure.', 1038, 202),
-  (2027, '2026-08-12 10:00:00', 'Good problem solving but struggled with follow-up questions.', 1039, 206);
+  (2027, '2026-08-12 10:00:00', 'Good problem solving but struggled with follow-up questions.', 1039, 206),
   (2028, '2026-11-02 09:30:00', 'Strong technical answers, communicates clearly.', 1041, 221),
   (2029, '2026-11-04 10:30:00', 'Good domain knowledge, light on hands-on examples.', 1042, 221),
   (2030, '2026-11-06 11:30:00', 'Thoughtful about trade-offs. Recommend moving forward.', 1043, 221),
@@ -538,7 +537,7 @@ INSERT INTO CANDIDATE_RANKING (RankingID, Score, RankPosition, ApplicationID) VA
   (3030, 71.81, 2, 1037),
   (3031, 58.47, 1, 1029),
   (3032, 56.14, 1, 1035),
-  (3033, 91.44, 1, 1038);
+  (3033, 91.44, 1, 1038),
   (3034, 91.20, 1, 1041),
   (3035, 84.10, 2, 1043),
   (3036, 78.45, 3, 1042),
@@ -585,7 +584,7 @@ INSERT INTO JOB_OFFER (OfferID, Salary, StartDate, ApplicationID) VALUES
   (4017, 111245.98, '2026-09-25', 1034),
   (4018, 128283.77, '2026-10-27', 1037),
   (4019, 131581.8, '2026-10-23', 1038),
-  (4020, 83469.92, '2026-11-19', 1039);
+  (4020, 83469.92, '2026-11-19', 1039),
   (4021, 112400.00, '2027-01-05', 1041),
   (4022, 98750.50, '2027-02-07', 1043),
   (4023, 134900.00, '2027-03-09', 1044),
@@ -638,7 +637,7 @@ INSERT INTO SENT_EMAIL (ApplicationID, TemplateID, SentDate) VALUES
   (1037, 1, '2026-07-25 09:15:00'),
   (1038, 1, '2026-07-19 09:15:00'),
   (1039, 1, '2026-08-05 09:15:00'),
-  (1040, 1, '2026-07-11 09:15:00');
+  (1040, 1, '2026-07-11 09:15:00'),
   (1003, 3, '2026-11-03 09:15:00'),
   (1004, 6, '2026-11-05 10:15:00'),
   (1005, 9, '2026-11-07 11:15:00'),
