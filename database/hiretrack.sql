@@ -712,7 +712,7 @@ UNION ALL SELECT 'JOB_OFFER',         COUNT(*) FROM JOB_OFFER
 UNION ALL SELECT 'SENT_EMAIL',        COUNT(*) FROM SENT_EMAIL;
 
 
--- Q2: Ranked candidate list for every posting.
+-- Ranked candidate list for every posting.
 SELECT      JP.Title, C.Name, CR.Score, CR.RankPosition, HS.StatusName
 FROM        CANDIDATE_RANKING AS CR, APPLICATION AS A, CANDIDATE AS C,
             JOB_POSTING AS JP, HIRING_STATUS AS HS
@@ -723,7 +723,7 @@ WHERE       CR.ApplicationID = A.ApplicationID
 ORDER BY    JP.Title, CR.RankPosition;
 
 
--- Q3: Every interview, with the candidate, the posting and the interviewer.
+-- Every interview, with the candidate, the posting and the interviewer.
 SELECT      I.ScheduledDate, C.Name AS Candidate, JP.Title,
             M.Name AS Interviewer, D.Name AS Department
 FROM        INTERVIEW AS I, APPLICATION AS A, CANDIDATE AS C,
