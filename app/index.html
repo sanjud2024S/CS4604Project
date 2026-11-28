@@ -336,13 +336,6 @@ function renderMenu(items) {
     menu.appendChild(button);
   });
 
-  // Database maintenance is separate from the role task menu.
-  if (currentUser && currentUser.role === "Admin") {
-    const dbButton = document.createElement("button");
-    dbButton.textContent = "Database maintenance";
-    dbButton.addEventListener("click", openDatabaseBrowser);
-    menu.appendChild(dbButton);
-  }
 }
 
 function showPanel(title, html) {
